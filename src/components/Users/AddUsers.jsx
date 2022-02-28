@@ -1,30 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Card from "../UI/Card/Card";
 import Button from "../UI/Button/Button";
 import ErrorModal from "../UI/ErrorModal/ErrorModal";
 import classes from "./AddUsers.module.css";
 
 const AddUsers = ({ addUser }) => {
+  const usernameRef = useRef();
+  const ageRef = useRef();
+
   const [error, setError] = useState();
-  const [user, setUser] = useState({
-    username: "",
-    age: "",
-  });
-  const [newUser, setNewUser] = useState({
-    username: "",
-    age: "",
-  });
 
   const onUserChange = (event) => {
     const { name, value } = event.target;
     console.log(`${name}, ${value}`);
-    setUser((prevValue) => ({ ...prevValue, [name]: value }));
   };
 
   const submitUser = (event) => {
     event.preventDefault();
 
-    const { username, age } = user;
+    const username = usernameRef.current?.value;
+    const age = ageRef.current?.value;
 
     if (!username && !age) {
       setError({
@@ -46,12 +41,9 @@ const AddUsers = ({ addUser }) => {
       return;
     }
 
-    setNewUser(user);
-    addUser(user);
-    setUser({
-      username: "",
-      age: "",
-    });
+    addUser({ username, age });
+    usernameRef.current.value = "";
+    ageRef.current.value = "";
   };
 
   const hideErrorModal = (_) => {
@@ -69,26 +61,23 @@ const AddUsers = ({ addUser }) => {
       )}
       <Card className={classes.input}>
         <h2 style={{ textAlign: "center" }}>
-          {newUser.username &&
-            newUser.age &&
-            `${newUser.username} is ${newUser.age} old`}
         </h2>
         <form onSubmit={submitUser}>
           <label htmlFor="username">Username</label>
           <input
+            ref={usernameRef}
             name="username"
             id="username"
             type="text"
             onChange={onUserChange}
-            value={user.username}
           />
           <label htmlFor="age">Age (Years)</label>
           <input
+            ref={ageRef}
             name="age"
             id="age"
             type="text"
             onChange={onUserChange}
-            value={user.age}
           />
           <Button type="submit">Add User</Button>
         </form>
